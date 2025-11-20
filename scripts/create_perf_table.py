@@ -18,7 +18,7 @@ NEW_PATTERN = re.compile(
 )
 # Example formats:
 #   example_threads_omp_enabled:task_run:0.4749
-#   example_processes_2_mpi_enabled:pipeline:0.0507
+#   nikitin_a_vec_sign_rotation_2_mpi_enabled:pipeline:0.0507
 SIMPLE_PATTERN = re.compile(
     r"(.+?)_(omp|seq|tbb|stl|all|mpi)_enabled:(task_run|pipeline):(-*\d*\.\d*)"
 )

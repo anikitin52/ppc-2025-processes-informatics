@@ -9,6 +9,6 @@ threads:
 processes:
   copying:
     mpi:
-      - example_processes
+      - nikitin_a_vec_sign_rotation
     seq:
-      - example_processes
+      - nikitin_a_vec_sign_rotation

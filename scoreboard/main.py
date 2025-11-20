@@ -860,10 +860,10 @@ def main():
         if s:
             proc_infos.append((d, s))
 
-    # Choose target identity: prefer example_processes; otherwise most common
+    # Choose target identity: prefer nikitin_a_vec_sign_rotation; otherwise most common
     target_identity = None
-    if "example_processes" in processes_task_dirs:
-        s0 = _load_student_info("example_processes")
+    if "nikitin_a_vec_sign_rotation" in processes_task_dirs:
+        s0 = _load_student_info("nikitin_a_vec_sign_rotation")
         if s0:
             target_identity = _identity_key(s0)
     if not target_identity and proc_infos:
@@ -1228,8 +1228,8 @@ def main():
                 proc_infos_g.append((d, s))
 
         target_identity_g = None
-        if "example_processes" in filtered_dirs:
-            s0 = _load_student_info_group("example_processes")
+        if "nikitin_a_vec_sign_rotation" in filtered_dirs:
+            s0 = _load_student_info_group("nikitin_a_vec_sign_rotation")
             if s0 and s0.get("group_number") == g:
                 target_identity_g = _id_key(s0)
         if not target_identity_g and proc_infos_g:
