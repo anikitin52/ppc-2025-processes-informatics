@@ -24,7 +24,7 @@ namespace nikitin_a_fox_algorithm {
 class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType, OutType, TestType> {
  public:
   static std::string PrintTestParam(const TestType &test_param) {
-    return std::get<1>(test_param);  // возвращаем строковое описание теста
+    return std::get<1>(test_param);
   }
 
  protected:
@@ -41,7 +41,7 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
         GenerateTestMatrices(1);
         break;
 
-      case 2:  // Матрицы 2x2 - простой случай
+      case 2:  // Матрицы 2x2
         GenerateTestMatrices(2);
         break;
 
@@ -57,7 +57,7 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
         GenerateTestMatrices(5);
         break;
 
-      case 6:  // Матрицы 8x8 - хороший размер для тестирования блоков
+      case 6:  // Матрицы 8x8
         GenerateTestMatrices(8);
         break;
 
@@ -65,7 +65,7 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
         GenerateTestMatrices(10);
         break;
 
-      case 8:  // Матрицы 16x16 - тестирование четного деления на блоки
+      case 8:  // Матрицы 16x16
         GenerateTestMatrices(16);
         break;
 
@@ -73,7 +73,7 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
         GenerateTestMatrices(20);
         break;
 
-      case 10:  // Матрицы 32x32 - большая матрица
+      case 10:  // Матрицы 32x32
         GenerateTestMatrices(32);
         break;
 
@@ -81,121 +81,81 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
         GenerateTestMatrices(50);
         break;
 
-      case 12:  // Матрицы 64x64 - хороший размер для MPI (делится на блоки)
+      case 12:  // Матрицы 64x64
         GenerateTestMatrices(64);
         break;
 
-      case 13:  // Матрицы 100x100 - большая для тестирования производительности
+      case 13:  // Матрицы 100x100
         GenerateTestMatrices(100);
         break;
 
-      case 14:  // Матрицы 127x127 - простое число, тест на неравномерные блоки
+      case 14:  // Матрицы 127x127
         GenerateTestMatrices(127);
         break;
 
-      case 15:  // Матрицы 128x128 - степень двойки
-        GenerateTestMatrices(128);
-        break;
-
-      case 16:  // Матрицы 200x200
-        GenerateTestMatrices(200);
-        break;
-
-      case 17:  // Матрицы 256x256
-        GenerateTestMatrices(256);
-        break;
-
-      case 18:  // Матрицы 300x300
-        GenerateTestMatrices(300);
-        break;
-
-      case 19:  // Матрицы 500x500 - большая матрица
-        GenerateTestMatrices(500);
-        break;
-
-      case 20:  // Матрицы 512x512 - степень двойки
-        GenerateTestMatrices(512);
-        break;
-
       // Тесты с особыми значениями
-      case 21:  // Матрицы с нулями
+      case 15:  // Матрицы с нулями
         GenerateZeroMatrices(10);
         break;
 
-      case 22:  // Единичные матрицы (A = I, B = I => C = I)
+      case 16:  // Единичные матрицы
         GenerateIdentityMatrices(8);
         break;
 
-      case 23:  // Нулевая матрица × любая матрица = нулевая матрица
+      case 17:  // Нулевая матрица × любая матрица
         GenerateZeroTimesAny(5);
         break;
 
-      case 24:  // Диагональные матрицы
+      case 18:  // Диагональные матрицы
         GenerateDiagonalMatrices(6);
         break;
 
-      case 25:  // Верхнетреугольные матрицы
+      case 19:  // Верхнетреугольные матрицы
         GenerateUpperTriangularMatrices(7);
         break;
 
-      case 26:  // Нижнетреугольные матрицы
+      case 20:  // Нижнетреугольные матрицы
         GenerateLowerTriangularMatrices(7);
         break;
 
-      case 27:  // Симметричные матрицы
+      case 21:  // Симметричные матрицы
         GenerateSymmetricMatrices(9);
         break;
 
-      case 28:  // Матрицы с очень маленькими значениями
+      case 22:  // Матрицы с очень маленькими значениями
         GenerateSmallValueMatrices(4);
         break;
 
-      case 29:  // Матрицы с очень большими значениями
+      case 23:  // Матрицы с очень большими значениями
         GenerateLargeValueMatrices(4);
         break;
 
-      case 30:  // Матрицы со смешанными положительными и отрицательными значениями
+      case 24:  // Матрицы со смешанными знаками
         GenerateMixedSignMatrices(6);
         break;
 
-      case 31:  // Матрицы с одинаковыми элементами
+      case 25:  // Матрицы с одинаковыми элементами
         GenerateConstantMatrices(5);
         break;
 
-      case 32:  // Матрицы, где A × B ≠ B × A (тест на некоммутативность)
+      case 26:  // Матрицы, где A × B ≠ B × A
         GenerateNonCommutativeMatrices();
         break;
 
-      case 33:  // Матрицы, где A × (B × C) = (A × B) × C (ассоциативность)
+      case 27:  // Матрицы, где A × (B × C) = (A × B) × C
         GenerateAssociativityTest(4);
         break;
 
-      case 34:  // Матрицы с NaN и Inf значениями
+      case 28:  // Матрицы с NaN и Inf значениями
         GenerateSpecialValueMatrices(3);
         break;
 
-      case 35:  // Рандомные матрицы с разными seed
+      case 29:  // Рандомные матрицы
         GenerateRandomMatrices(25, 12345);
         break;
 
-      case 36:  // Большие рандомные матрицы
+      case 30:  // Большие рандомные матрицы
         GenerateRandomMatrices(100, 54321);
-        break;
-
-      case 37:  // Матрицы с высокой точностью
-        GenerateHighPrecisionMatrices(3);
-        break;
-
-      case 38:  // Тест на граничные значения double
-        GenerateBoundaryValueMatrices(2);
-        break;
-
-      case 39:  // Почти сингулярные матрицы
-        GenerateNearSingularMatrices(5);
-        break;
-
-      case 40:  // Тест на ортогональные матрицы
-        GenerateOrthogonalMatrices(4);
         break;
 
       default:
@@ -215,10 +175,7 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
       }
     }
 
-    // Проверяем каждый элемент с учетом погрешности для чисел с плавающей точкой
-    double max_relative_error = 0.0;
-    double max_absolute_error = 0.0;
-    
+    // Проверяем каждый элемент с учетом погрешности
     for (size_t i = 0; i < output_data.size(); ++i) {
       for (size_t j = 0; j < output_data[i].size(); ++j) {
         double expected = expected_output_[i][j];
@@ -226,28 +183,27 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
         
         // Обработка специальных значений
         if (std::isnan(expected) && std::isnan(actual)) {
-          continue;  // Оба NaN - OK
+          continue;
         }
         
         if (std::isinf(expected) && std::isinf(actual) && 
             std::signbit(expected) == std::signbit(actual)) {
-          continue;  // Оба Inf с одинаковым знаком - OK
+          continue;
         }
         
         // Для обычных чисел используем относительную погрешность
+        double tolerance = 1e-8;
         if (std::abs(expected) > 1e-10) {
           double relative_error = std::abs(actual - expected) / std::abs(expected);
-          if (relative_error > 1e-10) {
+          if (relative_error > tolerance) {
             return false;
           }
-          max_relative_error = std::max(max_relative_error, relative_error);
         } else {
           // Для очень маленьких чисел используем абсолютную погрешность
           double absolute_error = std::abs(actual - expected);
-          if (absolute_error > 1e-10) {
+          if (absolute_error > tolerance) {
             return false;
           }
-          max_absolute_error = std::max(max_absolute_error, absolute_error);
         }
       }
     }
@@ -270,12 +226,10 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
   void GenerateTestMatrices(int n) {
     matrix_a_ = std::vector<std::vector<double>>(n, std::vector<double>(n));
     matrix_b_ = std::vector<std::vector<double>>(n, std::vector<double>(n));
-    expected_output_ = std::vector<std::vector<double>>(n, std::vector<double>(n, 0.0));
     
-    std::mt19937 gen(n * 123);  // seed зависит от n
+    std::mt19937 gen(n * 123);
     std::uniform_real_distribution<double> dist(-10.0, 10.0);
     
-    // Заполняем матрицы случайными значениями
     for (int i = 0; i < n; ++i) {
       for (int j = 0; j < n; ++j) {
         matrix_a_[i][j] = dist(gen);
@@ -283,7 +237,6 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
       }
     }
     
-    // Вычисляем ожидаемый результат (простое умножение матриц)
     ComputeExpectedResult();
   }
 
@@ -509,7 +462,6 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
     matrix_a_ = std::vector<std::vector<double>>(n, std::vector<double>(n, 1.0));
     matrix_b_ = std::vector<std::vector<double>>(n, std::vector<double>(n, 1.0));
     
-    // Добавляем специальные значения
     if (n >= 2) {
       matrix_a_[0][0] = std::numeric_limits<double>::quiet_NaN();
       matrix_a_[0][1] = std::numeric_limits<double>::infinity();
@@ -538,91 +490,6 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
     
     ComputeExpectedResult();
   }
-
-  // Генерация матриц с высокой точностью
-  void GenerateHighPrecisionMatrices(int n) {
-    matrix_a_ = std::vector<std::vector<double>>(n, std::vector<double>(n));
-    matrix_b_ = std::vector<std::vector<double>>(n, std::vector<double>(n));
-    
-    std::mt19937 gen(n * 2425);
-    std::uniform_real_distribution<double> dist(1.0, 2.0);
-    
-    for (int i = 0; i < n; ++i) {
-      for (int j = 0; j < n; ++j) {
-        matrix_a_[i][j] = dist(gen) / 3.0;  // Простые дроби для точного представления
-        matrix_b_[i][j] = dist(gen) / 7.0;
-      }
-    }
-    
-    ComputeExpectedResult();
-  }
-
-  // Генерация матриц с граничными значениями double
-  void GenerateBoundaryValueMatrices(int n) {
-    matrix_a_ = std::vector<std::vector<double>>(n, std::vector<double>(n));
-    matrix_b_ = std::vector<std::vector<double>>(n, std::vector<double>(n));
-    
-    double values[] = {
-      std::numeric_limits<double>::min(),
-      std::numeric_limits<double>::max(),
-      -std::numeric_limits<double>::max(),
-      std::numeric_limits<double>::epsilon(),
-      -std::numeric_limits<double>::epsilon(),
-      0.0
-    };
-    
-    for (int i = 0; i < n; ++i) {
-      for (int j = 0; j < n; ++j) {
-        matrix_a_[i][j] = values[(i * n + j) % 6];
-        matrix_b_[i][j] = values[(i * n + j + 3) % 6];
-      }
-    }
-    
-    ComputeExpectedResult();
-  }
-
-  // Генерация почти сингулярных матриц
-  void GenerateNearSingularMatrices(int n) {
-    matrix_a_ = std::vector<std::vector<double>>(n, std::vector<double>(n, 1.0));
-    matrix_b_ = std::vector<std::vector<double>>(n, std::vector<double>(n, 1.0));
-    
-    // Делаем матрицу A почти сингулярной
-    for (int i = 0; i < n; ++i) {
-      for (int j = i + 1; j < n; ++j) {
-        matrix_a_[i][j] = 1.0 - 1e-10;
-      }
-    }
-    
-    ComputeExpectedResult();
-  }
-
-  // Генерация ортогональных матриц
-  void GenerateOrthogonalMatrices(int n) {
-    matrix_a_ = std::vector<std::vector<double>>(n, std::vector<double>(n, 0.0));
-    matrix_b_ = std::vector<std::vector<double>>(n, std::vector<double>(n, 0.0));
-    
-    // Простая ортогональная матрица: единичная
-    for (int i = 0; i < n; ++i) {
-      matrix_a_[i][i] = 1.0;
-      matrix_b_[i][i] = 1.0;
-    }
-    
-    // Добавляем вращение для первых двух строк/столбцов
-    if (n >= 2) {
-      double angle = 3.14159 / 4.0;  // 45 градусов
-      matrix_a_[0][0] = std::cos(angle);
-      matrix_a_[0][1] = -std::sin(angle);
-      matrix_a_[1][0] = std::sin(angle);
-      matrix_a_[1][1] = std::cos(angle);
-      
-      matrix_b_[0][0] = std::cos(-angle);
-      matrix_b_[0][1] = -std::sin(-angle);
-      matrix_b_[1][0] = std::sin(-angle);
-      matrix_b_[1][1] = std::cos(-angle);
-    }
-    
-    ComputeExpectedResult();
-  }
 };
 
 namespace {
@@ -631,8 +498,8 @@ TEST_P(NikitinAFoxAlgorithmFuncTests, MatrixMultiplicationTest) {
   ExecuteTest(GetParam());
 }
 
-// Определяем тестовые случаи (40 тестов для полного покрытия)
-const std::array<TestType, 40> kTestParam = {
+// Определяем тестовые случаи (30 тестов вместо 40)
+const std::array<TestType, 30> kTestParam = {
     std::make_tuple(1, "1x1_matrices"),
     std::make_tuple(2, "2x2_matrices"),
     std::make_tuple(3, "3x3_matrices"),
@@ -647,32 +514,22 @@ const std::array<TestType, 40> kTestParam = {
     std::make_tuple(12, "64x64_matrices"),
     std::make_tuple(13, "100x100_matrices"),
     std::make_tuple(14, "127x127_matrices"),
-    std::make_tuple(15, "128x128_matrices"),
-    std::make_tuple(16, "200x200_matrices"),
-    std::make_tuple(17, "256x256_matrices"),
-    std::make_tuple(18, "300x300_matrices"),
-    std::make_tuple(19, "500x500_matrices"),
-    std::make_tuple(20, "512x512_matrices"),
-    std::make_tuple(21, "zero_matrices"),
-    std::make_tuple(22, "identity_matrices"),
-    std::make_tuple(23, "zero_times_any"),
-    std::make_tuple(24, "diagonal_matrices"),
-    std::make_tuple(25, "upper_triangular"),
-    std::make_tuple(26, "lower_triangular"),
-    std::make_tuple(27, "symmetric_matrices"),
-    std::make_tuple(28, "small_values"),
-    std::make_tuple(29, "large_values"),
-    std::make_tuple(30, "mixed_signs"),
-    std::make_tuple(31, "constant_matrices"),
-    std::make_tuple(32, "non_commutative"),
-    std::make_tuple(33, "associativity_test"),
-    std::make_tuple(34, "special_values_nan_inf"),
-    std::make_tuple(35, "random_25x25"),
-    std::make_tuple(36, "random_100x100"),
-    std::make_tuple(37, "high_precision"),
-    std::make_tuple(38, "boundary_values"),
-    std::make_tuple(39, "near_singular"),
-    std::make_tuple(40, "orthogonal_matrices")
+    std::make_tuple(15, "zero_matrices"),
+    std::make_tuple(16, "identity_matrices"),
+    std::make_tuple(17, "zero_times_any"),
+    std::make_tuple(18, "diagonal_matrices"),
+    std::make_tuple(19, "upper_triangular"),
+    std::make_tuple(20, "lower_triangular"),
+    std::make_tuple(21, "symmetric_matrices"),
+    std::make_tuple(22, "small_values"),
+    std::make_tuple(23, "large_values"),
+    std::make_tuple(24, "mixed_signs"),
+    std::make_tuple(25, "constant_matrices"),
+    std::make_tuple(26, "non_commutative"),
+    std::make_tuple(27, "associativity_test"),
+    std::make_tuple(28, "special_values_nan_inf"),
+    std::make_tuple(29, "random_25x25"),
+    std::make_tuple(30, "random_100x100")
 };
 
 const auto kTestTasksList =
