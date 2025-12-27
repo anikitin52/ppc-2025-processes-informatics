@@ -51,6 +51,7 @@ void NikitinAFoxAlgorithmSEQ::MultiplySingleBlock(int a_row_start, int a_row_end
                                                   const std::vector<std::vector<double>> &matrix_a,
                                                   const std::vector<std::vector<double>> &matrix_b,
                                                   std::vector<std::vector<double>> &matrix_c) {
+  // Умножаем один блок матриц
   for (int i = a_row_start; i < a_row_end; ++i) {
     for (int k = a_col_start; k < a_col_end; ++k) {
       const double a_ik = matrix_a[i][k];
@@ -61,10 +62,22 @@ void NikitinAFoxAlgorithmSEQ::MultiplySingleBlock(int a_row_start, int a_row_end
   }
 }
 
-void NikitinAFoxAlgorithmSEQ::MultiplyBlocks(int n, int block_size, int grid_size,
-                                             const std::vector<std::vector<double>> &matrix_a,
-                                             const std::vector<std::vector<double>> &matrix_b,
-                                             std::vector<std::vector<double>> &matrix_c) {
+bool NikitinAFoxAlgorithmSEQ::RunImpl() {
+  const auto &[matrix_a, matrix_b] = GetInput();
+
+  const auto n = static_cast<int>(matrix_a.size());
+
+  // Инициализируем выходную матрицу нулями
+  std::vector<std::vector<double>> matrix_c(n, std::vector<double>(n, 0.0));
+
+  // Определяем размер блока - выбираем оптимальный для кэша
+  int block_size = 64;
+  block_size = std::min(n, block_size);
+
+  // Вычисляем количество блоков
+  const int grid_size = (n + block_size - 1) / block_size;
+
+  // Алгоритм Фокса (последовательная версия)
   for (int iter = 0; iter < grid_size; ++iter) {
     for (int block_i = 0; block_i < grid_size; ++block_i) {
       for (int block_j = 0; block_j < grid_size; ++block_j) {
@@ -87,25 +100,6 @@ void NikitinAFoxAlgorithmSEQ::MultiplyBlocks(int n, int block_size, int grid_siz
       }
     }
   }
-}
-
-bool NikitinAFoxAlgorithmSEQ::RunImpl() {
-  const auto &[matrix_a, matrix_b] = GetInput();
-
-  const auto n = static_cast<int>(matrix_a.size());
-
-  // Инициализируем выходную матрицу нулями
-  std::vector<std::vector<double>> matrix_c(n, std::vector<double>(n, 0.0));
-
-  // Определяем размер блока - выбираем оптимальный для кэша
-  int block_size = 64;
-  block_size = std::min(n, block_size);
-
-  // Вычисляем количество блоков
-  const int grid_size = (n + block_size - 1) / block_size;
-
-  // Алгоритм Фокса (последовательная версия)
-  MultiplyBlocks(n, block_size, grid_size, matrix_a, matrix_b, matrix_c);
 
   // Сохраняем результат
   GetOutput() = matrix_c;
