@@ -16,30 +16,30 @@ NikitinAFoxAlgorithmSEQ::NikitinAFoxAlgorithmSEQ(const InType &in) {
 }
 
 bool NikitinAFoxAlgorithmSEQ::ValidationImpl() {
-  const auto& matrix_a = GetInput().first;
-  const auto& matrix_b = GetInput().second;
-  
+  const auto &matrix_a = GetInput().first;
+  const auto &matrix_b = GetInput().second;
+
   if (matrix_a.empty() || matrix_b.empty()) {
     return false;
   }
-  
+
   int n = matrix_a.size();
   for (int i = 0; i < n; ++i) {
     if (matrix_a[i].size() != static_cast<size_t>(n)) {
       return false;
     }
   }
-  
+
   if (matrix_b.size() != static_cast<size_t>(n)) {
     return false;
   }
-  
+
   for (int i = 0; i < n; ++i) {
     if (matrix_b[i].size() != static_cast<size_t>(n)) {
       return false;
     }
   }
-  
+
   return true;
 }
 
@@ -48,39 +48,39 @@ bool NikitinAFoxAlgorithmSEQ::PreProcessingImpl() {
 }
 
 bool NikitinAFoxAlgorithmSEQ::RunImpl() {
-  const auto& [matrix_a, matrix_b] = GetInput();
-  
+  const auto &[matrix_a, matrix_b] = GetInput();
+
   int n = matrix_a.size();
-  
+
   // Инициализируем выходную матрицу нулями
   std::vector<std::vector<double>> matrix_c(n, std::vector<double>(n, 0.0));
-  
+
   // Определяем размер блока - выбираем оптимальный для кэша
   int block_size = 64;
   if (n < block_size) {
     block_size = n;
   }
-  
+
   // Вычисляем количество блоков
   int grid_size = (n + block_size - 1) / block_size;
-  
+
   // Алгоритм Фокса (последовательная версия)
   for (int iter = 0; iter < grid_size; ++iter) {
     for (int block_i = 0; block_i < grid_size; ++block_i) {
       for (int block_j = 0; block_j < grid_size; ++block_j) {
         // Вычисляем, какой блок матрицы A "активен" на этой итерации
         int a_block_k = (block_i + iter) % grid_size;
-        
+
         // Границы блоков для A
         int a_row_start = block_i * block_size;
         int a_row_end = std::min(a_row_start + block_size, n);
         int a_col_start = a_block_k * block_size;
         int a_col_end = std::min(a_col_start + block_size, n);
-        
+
         // Границы блоков для B и C
         int b_col_start = block_j * block_size;
         int b_col_end = std::min(b_col_start + block_size, n);
-        
+
         // Умножаем блоки матриц
         for (int i = a_row_start; i < a_row_end; ++i) {
           for (int k = a_col_start; k < a_col_end; ++k) {
@@ -93,15 +93,15 @@ bool NikitinAFoxAlgorithmSEQ::RunImpl() {
       }
     }
   }
-  
+
   // Сохраняем результат
   GetOutput() = matrix_c;
-  
+
   return true;
 }
 
 bool NikitinAFoxAlgorithmSEQ::PostProcessingImpl() {
-  const auto& matrix_c = GetOutput();
+  const auto &matrix_c = GetOutput();
   return !matrix_c.empty();
 }
 

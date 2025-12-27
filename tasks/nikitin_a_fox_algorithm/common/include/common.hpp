@@ -8,10 +8,9 @@
 namespace nikitin_a_fox_algorithm {
 
 // Входные данные: пара матриц
-using InType = std::pair<
-    std::vector<std::vector<double>>,  // matrix_a
-    std::vector<std::vector<double>>   // matrix_b
->;
+using InType = std::pair<std::vector<std::vector<double>>,  // matrix_a
+                         std::vector<std::vector<double>>   // matrix_b
+                         >;
 
 // Выходные данные: результирующая матрица
 using OutType = std::vector<std::vector<double>>;

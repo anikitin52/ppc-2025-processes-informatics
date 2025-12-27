@@ -168,7 +168,7 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
     if (output_data.size() != expected_output_.size()) {
       return false;
     }
-    
+
     for (size_t i = 0; i < output_data.size(); ++i) {
       if (output_data[i].size() != expected_output_[i].size()) {
         return false;
@@ -180,17 +180,16 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
       for (size_t j = 0; j < output_data[i].size(); ++j) {
         double expected = expected_output_[i][j];
         double actual = output_data[i][j];
-        
+
         // Обработка специальных значений
         if (std::isnan(expected) && std::isnan(actual)) {
           continue;
         }
-        
-        if (std::isinf(expected) && std::isinf(actual) && 
-            std::signbit(expected) == std::signbit(actual)) {
+
+        if (std::isinf(expected) && std::isinf(actual) && std::signbit(expected) == std::signbit(actual)) {
           continue;
         }
-        
+
         // Для обычных чисел используем относительную погрешность
         double tolerance = 1e-8;
         if (std::abs(expected) > 1e-10) {
@@ -226,17 +225,17 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
   void GenerateTestMatrices(int n) {
     matrix_a_ = std::vector<std::vector<double>>(n, std::vector<double>(n));
     matrix_b_ = std::vector<std::vector<double>>(n, std::vector<double>(n));
-    
+
     std::mt19937 gen(n * 123);
     std::uniform_real_distribution<double> dist(-10.0, 10.0);
-    
+
     for (int i = 0; i < n; ++i) {
       for (int j = 0; j < n; ++j) {
         matrix_a_[i][j] = dist(gen);
         matrix_b_[i][j] = dist(gen);
       }
     }
-    
+
     ComputeExpectedResult();
   }
 
@@ -244,7 +243,7 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
   void ComputeExpectedResult() {
     int n = matrix_a_.size();
     expected_output_ = std::vector<std::vector<double>>(n, std::vector<double>(n, 0.0));
-    
+
     for (int i = 0; i < n; ++i) {
       for (int j = 0; j < n; ++j) {
         double sum = 0.0;
@@ -268,7 +267,7 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
     matrix_a_ = std::vector<std::vector<double>>(n, std::vector<double>(n, 0.0));
     matrix_b_ = std::vector<std::vector<double>>(n, std::vector<double>(n, 0.0));
     expected_output_ = std::vector<std::vector<double>>(n, std::vector<double>(n, 0.0));
-    
+
     for (int i = 0; i < n; ++i) {
       matrix_a_[i][i] = 1.0;
       matrix_b_[i][i] = 1.0;
@@ -281,10 +280,10 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
     matrix_a_ = std::vector<std::vector<double>>(n, std::vector<double>(n, 0.0));
     matrix_b_ = std::vector<std::vector<double>>(n, std::vector<double>(n));
     expected_output_ = std::vector<std::vector<double>>(n, std::vector<double>(n, 0.0));
-    
+
     std::mt19937 gen(n * 456);
     std::uniform_real_distribution<double> dist(-100.0, 100.0);
-    
+
     for (int i = 0; i < n; ++i) {
       for (int j = 0; j < n; ++j) {
         matrix_b_[i][j] = dist(gen);
@@ -296,15 +295,15 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
   void GenerateDiagonalMatrices(int n) {
     matrix_a_ = std::vector<std::vector<double>>(n, std::vector<double>(n, 0.0));
     matrix_b_ = std::vector<std::vector<double>>(n, std::vector<double>(n, 0.0));
-    
+
     std::mt19937 gen(n * 789);
     std::uniform_real_distribution<double> dist(1.0, 10.0);
-    
+
     for (int i = 0; i < n; ++i) {
       matrix_a_[i][i] = dist(gen);
       matrix_b_[i][i] = dist(gen);
     }
-    
+
     ComputeExpectedResult();
   }
 
@@ -312,17 +311,17 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
   void GenerateUpperTriangularMatrices(int n) {
     matrix_a_ = std::vector<std::vector<double>>(n, std::vector<double>(n, 0.0));
     matrix_b_ = std::vector<std::vector<double>>(n, std::vector<double>(n, 0.0));
-    
+
     std::mt19937 gen(n * 1011);
     std::uniform_real_distribution<double> dist(1.0, 5.0);
-    
+
     for (int i = 0; i < n; ++i) {
       for (int j = i; j < n; ++j) {
         matrix_a_[i][j] = dist(gen);
         matrix_b_[i][j] = dist(gen);
       }
     }
-    
+
     ComputeExpectedResult();
   }
 
@@ -330,17 +329,17 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
   void GenerateLowerTriangularMatrices(int n) {
     matrix_a_ = std::vector<std::vector<double>>(n, std::vector<double>(n, 0.0));
     matrix_b_ = std::vector<std::vector<double>>(n, std::vector<double>(n, 0.0));
-    
+
     std::mt19937 gen(n * 1213);
     std::uniform_real_distribution<double> dist(1.0, 5.0);
-    
+
     for (int i = 0; i < n; ++i) {
       for (int j = 0; j <= i; ++j) {
         matrix_a_[i][j] = dist(gen);
         matrix_b_[i][j] = dist(gen);
       }
     }
-    
+
     ComputeExpectedResult();
   }
 
@@ -348,22 +347,22 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
   void GenerateSymmetricMatrices(int n) {
     matrix_a_ = std::vector<std::vector<double>>(n, std::vector<double>(n, 0.0));
     matrix_b_ = std::vector<std::vector<double>>(n, std::vector<double>(n, 0.0));
-    
+
     std::mt19937 gen(n * 1415);
     std::uniform_real_distribution<double> dist(-5.0, 5.0);
-    
+
     for (int i = 0; i < n; ++i) {
       for (int j = i; j < n; ++j) {
         double val = dist(gen);
         matrix_a_[i][j] = val;
         matrix_a_[j][i] = val;
-        
+
         val = dist(gen);
         matrix_b_[i][j] = val;
         matrix_b_[j][i] = val;
       }
     }
-    
+
     ComputeExpectedResult();
   }
 
@@ -371,17 +370,17 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
   void GenerateSmallValueMatrices(int n) {
     matrix_a_ = std::vector<std::vector<double>>(n, std::vector<double>(n));
     matrix_b_ = std::vector<std::vector<double>>(n, std::vector<double>(n));
-    
+
     std::mt19937 gen(n * 1617);
     std::uniform_real_distribution<double> dist(1e-15, 1e-10);
-    
+
     for (int i = 0; i < n; ++i) {
       for (int j = 0; j < n; ++j) {
         matrix_a_[i][j] = dist(gen);
         matrix_b_[i][j] = dist(gen);
       }
     }
-    
+
     ComputeExpectedResult();
   }
 
@@ -389,17 +388,17 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
   void GenerateLargeValueMatrices(int n) {
     matrix_a_ = std::vector<std::vector<double>>(n, std::vector<double>(n));
     matrix_b_ = std::vector<std::vector<double>>(n, std::vector<double>(n));
-    
+
     std::mt19937 gen(n * 1819);
     std::uniform_real_distribution<double> dist(1e10, 1e15);
-    
+
     for (int i = 0; i < n; ++i) {
       for (int j = 0; j < n; ++j) {
         matrix_a_[i][j] = dist(gen);
         matrix_b_[i][j] = dist(gen);
       }
     }
-    
+
     ComputeExpectedResult();
   }
 
@@ -407,17 +406,17 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
   void GenerateMixedSignMatrices(int n) {
     matrix_a_ = std::vector<std::vector<double>>(n, std::vector<double>(n));
     matrix_b_ = std::vector<std::vector<double>>(n, std::vector<double>(n));
-    
+
     std::mt19937 gen(n * 2021);
     std::uniform_real_distribution<double> dist(-1000.0, 1000.0);
-    
+
     for (int i = 0; i < n; ++i) {
       for (int j = 0; j < n; ++j) {
         matrix_a_[i][j] = dist(gen);
         matrix_b_[i][j] = dist(gen);
       }
     }
-    
+
     ComputeExpectedResult();
   }
 
@@ -425,7 +424,7 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
   void GenerateConstantMatrices(int n) {
     double val_a = 2.5;
     double val_b = 3.5;
-    
+
     matrix_a_ = std::vector<std::vector<double>>(n, std::vector<double>(n, val_a));
     matrix_b_ = std::vector<std::vector<double>>(n, std::vector<double>(n, val_b));
     expected_output_ = std::vector<std::vector<double>>(n, std::vector<double>(n, val_a * val_b * n));
@@ -435,7 +434,7 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
   void GenerateNonCommutativeMatrices() {
     matrix_a_ = {{1, 2}, {3, 4}};
     matrix_b_ = {{5, 6}, {7, 8}};
-    
+
     ComputeExpectedResult();
   }
 
@@ -443,17 +442,17 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
   void GenerateAssociativityTest(int n) {
     matrix_a_ = std::vector<std::vector<double>>(n, std::vector<double>(n));
     matrix_b_ = std::vector<std::vector<double>>(n, std::vector<double>(n));
-    
+
     std::mt19937 gen(n * 2223);
     std::uniform_real_distribution<double> dist(-5.0, 5.0);
-    
+
     for (int i = 0; i < n; ++i) {
       for (int j = 0; j < n; ++j) {
         matrix_a_[i][j] = dist(gen);
         matrix_b_[i][j] = dist(gen);
       }
     }
-    
+
     ComputeExpectedResult();
   }
 
@@ -461,15 +460,15 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
   void GenerateSpecialValueMatrices(int n) {
     matrix_a_ = std::vector<std::vector<double>>(n, std::vector<double>(n, 1.0));
     matrix_b_ = std::vector<std::vector<double>>(n, std::vector<double>(n, 1.0));
-    
+
     if (n >= 2) {
       matrix_a_[0][0] = std::numeric_limits<double>::quiet_NaN();
       matrix_a_[0][1] = std::numeric_limits<double>::infinity();
       matrix_a_[1][0] = -std::numeric_limits<double>::infinity();
-      
+
       matrix_b_[1][1] = std::numeric_limits<double>::quiet_NaN();
     }
-    
+
     ComputeExpectedResult();
   }
 
@@ -477,17 +476,17 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
   void GenerateRandomMatrices(int n, int seed) {
     matrix_a_ = std::vector<std::vector<double>>(n, std::vector<double>(n));
     matrix_b_ = std::vector<std::vector<double>>(n, std::vector<double>(n));
-    
+
     std::mt19937 gen(seed);
     std::uniform_real_distribution<double> dist(-100.0, 100.0);
-    
+
     for (int i = 0; i < n; ++i) {
       for (int j = 0; j < n; ++j) {
         matrix_a_[i][j] = dist(gen);
         matrix_b_[i][j] = dist(gen);
       }
     }
-    
+
     ComputeExpectedResult();
   }
 };
@@ -498,43 +497,27 @@ TEST_P(NikitinAFoxAlgorithmFuncTests, MatrixMultiplicationTest) {
   ExecuteTest(GetParam());
 }
 
-// Определяем тестовые случаи 
+// Определяем тестовые случаи
 const std::array<TestType, 30> kTestParam = {
-    std::make_tuple(1, "1x1_matrices"),
-    std::make_tuple(2, "2x2_matrices"),
-    std::make_tuple(3, "3x3_matrices"),
-    std::make_tuple(4, "4x4_matrices"),
-    std::make_tuple(5, "5x5_matrices"),
-    std::make_tuple(6, "8x8_matrices"),
-    std::make_tuple(7, "10x10_matrices"),
-    std::make_tuple(8, "16x16_matrices"),
-    std::make_tuple(9, "20x20_matrices"),
-    std::make_tuple(10, "32x32_matrices"),
-    std::make_tuple(11, "50x50_matrices"),
-    std::make_tuple(12, "64x64_matrices"),
-    std::make_tuple(13, "100x100_matrices"),
-    std::make_tuple(14, "127x127_matrices"),
-    std::make_tuple(15, "zero_matrices"),
-    std::make_tuple(16, "identity_matrices"),
-    std::make_tuple(17, "zero_times_any"),
-    std::make_tuple(18, "diagonal_matrices"),
-    std::make_tuple(19, "upper_triangular"),
-    std::make_tuple(20, "lower_triangular"),
-    std::make_tuple(21, "symmetric_matrices"),
-    std::make_tuple(22, "small_values"),
-    std::make_tuple(23, "large_values"),
-    std::make_tuple(24, "mixed_signs"),
-    std::make_tuple(25, "constant_matrices"),
-    std::make_tuple(26, "non_commutative"),
-    std::make_tuple(27, "associativity_test"),
-    std::make_tuple(28, "special_values_nan_inf"),
-    std::make_tuple(29, "random_25x25"),
-    std::make_tuple(30, "random_100x100")
-};
+    std::make_tuple(1, "1x1_matrices"),        std::make_tuple(2, "2x2_matrices"),
+    std::make_tuple(3, "3x3_matrices"),        std::make_tuple(4, "4x4_matrices"),
+    std::make_tuple(5, "5x5_matrices"),        std::make_tuple(6, "8x8_matrices"),
+    std::make_tuple(7, "10x10_matrices"),      std::make_tuple(8, "16x16_matrices"),
+    std::make_tuple(9, "20x20_matrices"),      std::make_tuple(10, "32x32_matrices"),
+    std::make_tuple(11, "50x50_matrices"),     std::make_tuple(12, "64x64_matrices"),
+    std::make_tuple(13, "100x100_matrices"),   std::make_tuple(14, "127x127_matrices"),
+    std::make_tuple(15, "zero_matrices"),      std::make_tuple(16, "identity_matrices"),
+    std::make_tuple(17, "zero_times_any"),     std::make_tuple(18, "diagonal_matrices"),
+    std::make_tuple(19, "upper_triangular"),   std::make_tuple(20, "lower_triangular"),
+    std::make_tuple(21, "symmetric_matrices"), std::make_tuple(22, "small_values"),
+    std::make_tuple(23, "large_values"),       std::make_tuple(24, "mixed_signs"),
+    std::make_tuple(25, "constant_matrices"),  std::make_tuple(26, "non_commutative"),
+    std::make_tuple(27, "associativity_test"), std::make_tuple(28, "special_values_nan_inf"),
+    std::make_tuple(29, "random_25x25"),       std::make_tuple(30, "random_100x100")};
 
-const auto kTestTasksList =
-    std::tuple_cat(ppc::util::AddFuncTask<NikitinAFoxAlgorithmMPI, InType>(kTestParam, PPC_SETTINGS_nikitin_a_fox_algorithm),
-                   ppc::util::AddFuncTask<NikitinAFoxAlgorithmSEQ, InType>(kTestParam, PPC_SETTINGS_nikitin_a_fox_algorithm));
+const auto kTestTasksList = std::tuple_cat(
+    ppc::util::AddFuncTask<NikitinAFoxAlgorithmMPI, InType>(kTestParam, PPC_SETTINGS_nikitin_a_fox_algorithm),
+    ppc::util::AddFuncTask<NikitinAFoxAlgorithmSEQ, InType>(kTestParam, PPC_SETTINGS_nikitin_a_fox_algorithm));
 
 const auto kGtestValues = ppc::util::ExpandToValues(kTestTasksList);
 
