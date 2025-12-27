@@ -17,6 +17,10 @@ class NikitinAFoxAlgorithmSEQ : public BaseTask {
   bool PreProcessingImpl() override;
   bool RunImpl() override;
   bool PostProcessingImpl() override;
+
+  // Вспомогательная функция
+  void MultiplyBlocks(int n, int block_size, int grid_size, const std::vector<std::vector<double>> &matrix_a,
+                      const std::vector<std::vector<double>> &matrix_b, std::vector<std::vector<double>> &matrix_c);
 };
 
 }  // namespace nikitin_a_fox_algorithm

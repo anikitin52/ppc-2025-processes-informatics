@@ -15,34 +15,40 @@ NikitinAFoxAlgorithmMPI::NikitinAFoxAlgorithmMPI(const InType &in) {
   GetInput() = in;
 }
 
+bool NikitinAFoxAlgorithmMPI::ValidateMatricesOnRoot() {
+  const auto &matrix_a = GetInput().first;
+  const auto &matrix_b = GetInput().second;
+
+  if (matrix_a.empty() || matrix_b.empty()) {
+    return false;
+  }
+
+  const auto n = static_cast<int>(matrix_a.size());
+  for (int i = 0; i < n; ++i) {
+    if (matrix_a[i].size() != static_cast<std::size_t>(n)) {
+      return false;
+    }
+  }
+
+  if (matrix_b.size() != static_cast<std::size_t>(n)) {
+    return false;
+  }
+
+  for (int i = 0; i < n; ++i) {
+    if (matrix_b[i].size() != static_cast<std::size_t>(n)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 bool NikitinAFoxAlgorithmMPI::ValidationImpl() {
   int rank = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   if (rank == 0) {
-    const auto &matrix_a = GetInput().first;
-    const auto &matrix_b = GetInput().second;
-
-    if (matrix_a.empty() || matrix_b.empty()) {
-      return false;
-    }
-
-    const auto n = static_cast<int>(matrix_a.size());
-    for (int i = 0; i < n; ++i) {
-      if (matrix_a[i].size() != static_cast<std::size_t>(n)) {
-        return false;
-      }
-    }
-
-    if (matrix_b.size() != static_cast<std::size_t>(n)) {
-      return false;
-    }
-
-    for (int i = 0; i < n; ++i) {
-      if (matrix_b[i].size() != static_cast<std::size_t>(n)) {
-        return false;
-      }
-    }
+    return ValidateMatricesOnRoot();
   }
 
   return true;
@@ -52,90 +58,56 @@ bool NikitinAFoxAlgorithmMPI::PreProcessingImpl() {
   return true;
 }
 
-bool NikitinAFoxAlgorithmMPI::RunImpl() {
-  int rank = 0;
-  int size = 0;
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  MPI_Comm_size(MPI_COMM_WORLD, &size);
+void NikitinAFoxAlgorithmMPI::DistributeMatrixB(int n, std::vector<double> &local_b) {
+  const auto &matrix_b = GetInput().second;
 
-  // Получаем размер матрицы
-  int n = 0;
-  if (rank == 0) {
-    n = static_cast<int>(GetInput().first.size());
+  for (int i = 0; i < n; ++i) {
+    const auto i_offset = static_cast<std::size_t>(i) * static_cast<std::size_t>(n);
+    for (int j = 0; j < n; ++j) {
+      local_b[i_offset + static_cast<std::size_t>(j)] = matrix_b[i][j];
+    }
   }
-  MPI_Bcast(&n, 1, MPI_INT, 0, MPI_COMM_WORLD);
+}
 
-  if (n == 0) {
-    return false;
+void NikitinAFoxAlgorithmMPI::DistributeMatrixA(int rank, int size, int n, int local_rows,
+                                                std::vector<double> &local_a) {
+  const auto &matrix_a = GetInput().first;
+  rank = 0;
+
+  // Сначала копируем строки для процесса 0
+  int current_row = 0;
+  for (int i = 0; i < local_rows; ++i) {
+    const auto i_offset = static_cast<std::size_t>(i) * static_cast<std::size_t>(n);
+    for (int j = 0; j < n; ++j) {
+      local_a[i_offset + static_cast<std::size_t>(j)] = matrix_a[current_row][j];
+    }
+    current_row++;
   }
 
-  // Вычисляем распределение строк
+  // Отправляем строки остальным процессам
   const int rows_per_proc = n / size;
   const int remainder = n % size;
 
-  // Количество строк для текущего процесса
-  const int local_rows = (rank < remainder) ? (rows_per_proc + 1) : rows_per_proc;
-  const auto local_elements = static_cast<std::size_t>(local_rows) * static_cast<std::size_t>(n);
+  for (int dest = 1; dest < size; ++dest) {
+    const int dest_rows = (dest < remainder) ? (rows_per_proc + 1) : rows_per_proc;
+    const auto dest_elements = static_cast<std::size_t>(dest_rows) * static_cast<std::size_t>(n);
+    std::vector<double> send_buffer(dest_elements);
 
-  // Создаем массив для матрицы B (будет одинаковый на всех процессах)
-  const auto total_elements = static_cast<std::size_t>(n) * static_cast<std::size_t>(n);
-  std::vector<double> local_b(total_elements);
-
-  // 1. Распределяем матрицу B всем процессам
-  if (rank == 0) {
-    const auto &matrix_b = GetInput().second;
-    // Заполняем локальный буфер матрицей B
-    for (int i = 0; i < n; ++i) {
+    for (int i = 0; i < dest_rows; ++i) {
       const auto i_offset = static_cast<std::size_t>(i) * static_cast<std::size_t>(n);
       for (int j = 0; j < n; ++j) {
-        local_b[i_offset + static_cast<std::size_t>(j)] = matrix_b[i][j];
-      }
-    }
-  }
-
-  // Рассылаем матрицу B всем процессам
-  MPI_Bcast(local_b.data(), static_cast<int>(total_elements), MPI_DOUBLE, 0, MPI_COMM_WORLD);
-
-  // 2. Распределяем матрицу A по строкам
-  std::vector<double> local_a(local_elements);
-
-  if (rank == 0) {
-    const auto &matrix_a = GetInput().first;
-
-    // Сначала копируем строки для процесса 0
-    int current_row = 0;
-    for (int i = 0; i < local_rows; ++i) {
-      const auto i_offset = static_cast<std::size_t>(i) * static_cast<std::size_t>(n);
-      for (int j = 0; j < n; ++j) {
-        local_a[i_offset + static_cast<std::size_t>(j)] = matrix_a[current_row][j];
+        send_buffer[i_offset + static_cast<std::size_t>(j)] = matrix_a[current_row][j];
       }
       current_row++;
     }
 
-    // Отправляем строки остальным процессам
-    for (int dest = 1; dest < size; ++dest) {
-      const int dest_rows = (dest < remainder) ? (rows_per_proc + 1) : rows_per_proc;
-      const auto dest_elements = static_cast<std::size_t>(dest_rows) * static_cast<std::size_t>(n);
-      std::vector<double> send_buffer(dest_elements);
-
-      for (int i = 0; i < dest_rows; ++i) {
-        const auto i_offset = static_cast<std::size_t>(i) * static_cast<std::size_t>(n);
-        for (int j = 0; j < n; ++j) {
-          send_buffer[i_offset + static_cast<std::size_t>(j)] = matrix_a[current_row][j];
-        }
-        current_row++;
-      }
-
-      MPI_Send(send_buffer.data(), static_cast<int>(dest_elements), MPI_DOUBLE, dest, 0, MPI_COMM_WORLD);
-    }
-  } else {
-    // Получаем свои строки от процесса 0
-    MPI_Recv(local_a.data(), static_cast<int>(local_elements), MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    MPI_Send(send_buffer.data(), static_cast<int>(dest_elements), MPI_DOUBLE, dest, 0, MPI_COMM_WORLD);
   }
+}
 
-  // 3. Локальное умножение
-  std::vector<double> local_c(local_elements, 0.0);
-
+void NikitinAFoxAlgorithmMPI::PerformLocalMultiplication(int n, int local_rows, const std::vector<double> &local_a,
+                                                         const std::vector<double> &local_b,
+                                                         std::vector<double> &local_c) {
   for (int i = 0; i < local_rows; ++i) {
     const auto i_idx = static_cast<std::size_t>(i) * static_cast<std::size_t>(n);
     for (int j = 0; j < n; ++j) {
@@ -147,45 +119,48 @@ bool NikitinAFoxAlgorithmMPI::RunImpl() {
       local_c[i_idx + static_cast<std::size_t>(j)] = sum;
     }
   }
+}
 
-  // 4. Сбор результатов на процессе 0
-  if (rank == 0) {
-    // Создаем результирующую матрицу
-    GetOutput() = std::vector<std::vector<double>>(n, std::vector<double>(n, 0.0));
+void NikitinAFoxAlgorithmMPI::CollectResults(int rank, int size, int n, int local_rows,
+                                             const std::vector<double> &local_c) {
+  const int rows_per_proc = n / size;
+  const int remainder = n % size;
+  rank = 0;
 
-    // Копируем свои результаты
-    int current_row = 0;
-    for (int i = 0; i < local_rows; ++i) {
+  // Создаем результирующую матрицу
+  GetOutput() = std::vector<std::vector<double>>(n, std::vector<double>(n, 0.0));
+
+  // Копируем свои результаты
+  int current_row = 0;
+  for (int i = 0; i < local_rows; ++i) {
+    const auto i_idx = static_cast<std::size_t>(i) * static_cast<std::size_t>(n);
+    for (int j = 0; j < n; ++j) {
+      GetOutput()[current_row][j] = local_c[i_idx + static_cast<std::size_t>(j)];
+    }
+    current_row++;
+  }
+
+  // Получаем результаты от других процессов
+  for (int src = 1; src < size; ++src) {
+    const int src_rows = (src < remainder) ? (rows_per_proc + 1) : rows_per_proc;
+    const auto src_elements = static_cast<std::size_t>(src_rows) * static_cast<std::size_t>(n);
+    std::vector<double> recv_buffer(src_elements);
+
+    MPI_Recv(recv_buffer.data(), static_cast<int>(src_elements), MPI_DOUBLE, src, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+    for (int i = 0; i < src_rows; ++i) {
       const auto i_idx = static_cast<std::size_t>(i) * static_cast<std::size_t>(n);
       for (int j = 0; j < n; ++j) {
-        GetOutput()[current_row][j] = local_c[i_idx + static_cast<std::size_t>(j)];
+        GetOutput()[current_row][j] = recv_buffer[i_idx + static_cast<std::size_t>(j)];
       }
       current_row++;
     }
-
-    // Получаем результаты от других процессов
-    for (int src = 1; src < size; ++src) {
-      const int src_rows = (src < remainder) ? (rows_per_proc + 1) : rows_per_proc;
-      const auto src_elements = static_cast<std::size_t>(src_rows) * static_cast<std::size_t>(n);
-      std::vector<double> recv_buffer(src_elements);
-
-      MPI_Recv(recv_buffer.data(), static_cast<int>(src_elements), MPI_DOUBLE, src, 1, MPI_COMM_WORLD,
-               MPI_STATUS_IGNORE);
-
-      for (int i = 0; i < src_rows; ++i) {
-        const auto i_idx = static_cast<std::size_t>(i) * static_cast<std::size_t>(n);
-        for (int j = 0; j < n; ++j) {
-          GetOutput()[current_row][j] = recv_buffer[i_idx + static_cast<std::size_t>(j)];
-        }
-        current_row++;
-      }
-    }
-  } else {
-    // Отправляем свои результаты процессу 0
-    MPI_Send(local_c.data(), static_cast<int>(local_elements), MPI_DOUBLE, 0, 1, MPI_COMM_WORLD);
   }
+}
 
-  // 5. Рассылаем результат всем процессам (для проверки в тестах)
+void NikitinAFoxAlgorithmMPI::BroadcastResults(int rank, int n) {
+  const auto total_elements = static_cast<std::size_t>(n) * static_cast<std::size_t>(n);
+
   if (rank == 0) {
     // Преобразуем результат в плоский массив для рассылки
     std::vector<double> flat_result(total_elements);
@@ -220,6 +195,66 @@ bool NikitinAFoxAlgorithmMPI::RunImpl() {
       }
     }
   }
+}
+
+bool NikitinAFoxAlgorithmMPI::RunImpl() {
+  int rank = 0;
+  int size = 0;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+  // Получаем размер матрицы
+  int n = 0;
+  if (rank == 0) {
+    n = static_cast<int>(GetInput().first.size());
+  }
+  MPI_Bcast(&n, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+  if (n == 0) {
+    return false;
+  }
+
+  // Вычисляем распределение строк
+  const int rows_per_proc = n / size;
+  const int remainder = n % size;
+
+  // Количество строк для текущего процесса
+  const int local_rows = (rank < remainder) ? (rows_per_proc + 1) : rows_per_proc;
+  const auto local_elements = static_cast<std::size_t>(local_rows) * static_cast<std::size_t>(n);
+
+  // 1. Распределяем матрицу B всем процессам
+  const auto total_elements = static_cast<std::size_t>(n) * static_cast<std::size_t>(n);
+  std::vector<double> local_b(total_elements);
+
+  if (rank == 0) {
+    DistributeMatrixB(n, local_b);
+  }
+
+  MPI_Bcast(local_b.data(), static_cast<int>(total_elements), MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+  // 2. Распределяем матрицу A по строкам
+  std::vector<double> local_a(local_elements);
+
+  if (rank == 0) {
+    DistributeMatrixA(rank, size, n, local_rows, local_a);
+  } else {
+    MPI_Recv(local_a.data(), static_cast<int>(local_elements), MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+  }
+
+  // 3. Локальное умножение
+  std::vector<double> local_c(local_elements, 0.0);
+  PerformLocalMultiplication(n, local_rows, local_a, local_b, local_c);
+
+  // 4. Сбор результатов на процессе 0
+  if (rank == 0) {
+    CollectResults(rank, size, n, local_rows, local_c);
+  } else {
+    // Отправляем свои результаты процессу 0
+    MPI_Send(local_c.data(), static_cast<int>(local_elements), MPI_DOUBLE, 0, 1, MPI_COMM_WORLD);
+  }
+
+  // 5. Рассылаем результат всем процессам (для проверки в тестах)
+  BroadcastResults(rank, n);
 
   return true;
 }

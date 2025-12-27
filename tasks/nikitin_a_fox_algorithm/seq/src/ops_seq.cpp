@@ -46,21 +46,10 @@ bool NikitinAFoxAlgorithmSEQ::PreProcessingImpl() {
   return true;
 }
 
-bool NikitinAFoxAlgorithmSEQ::RunImpl() {
-  const auto &[matrix_a, matrix_b] = GetInput();
-
-  const auto n = static_cast<int>(matrix_a.size());
-
-  // Инициализируем выходную матрицу нулями
-  std::vector<std::vector<double>> matrix_c(n, std::vector<double>(n, 0.0));
-
-  // Определяем размер блока - выбираем оптимальный для кэша
-  int block_size = 64;
-  block_size = std::min(n, block_size);
-
-  // Вычисляем количество блоков
-  const int grid_size = (n + block_size - 1) / block_size;
-
+void NikitinAFoxAlgorithmSEQ::MultiplyBlocks(int n, int block_size, int grid_size,
+                                             const std::vector<std::vector<double>> &matrix_a,
+                                             const std::vector<std::vector<double>> &matrix_b,
+                                             std::vector<std::vector<double>> &matrix_c) {
   // Алгоритм Фокса (последовательная версия)
   for (int iter = 0; iter < grid_size; ++iter) {
     for (int block_i = 0; block_i < grid_size; ++block_i) {
@@ -90,6 +79,25 @@ bool NikitinAFoxAlgorithmSEQ::RunImpl() {
       }
     }
   }
+}
+
+bool NikitinAFoxAlgorithmSEQ::RunImpl() {
+  const auto &[matrix_a, matrix_b] = GetInput();
+
+  const auto n = static_cast<int>(matrix_a.size());
+
+  // Инициализируем выходную матрицу нулями
+  std::vector<std::vector<double>> matrix_c(n, std::vector<double>(n, 0.0));
+
+  // Определяем размер блока - выбираем оптимальный для кэша
+  int block_size = 64;
+  block_size = std::min(n, block_size);
+
+  // Вычисляем количество блоков
+  const int grid_size = (n + block_size - 1) / block_size;
+
+  // Выполняем умножение блоков
+  MultiplyBlocks(n, block_size, grid_size, matrix_a, matrix_b, matrix_c);
 
   // Сохраняем результат
   GetOutput() = matrix_c;
