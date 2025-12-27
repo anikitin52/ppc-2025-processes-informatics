@@ -1,23 +1,18 @@
 #include <gtest/gtest.h>
-#include <stb/stb_image.h>
 
-#include <algorithm>
 #include <array>
 #include <cmath>
 #include <cstddef>
 #include <limits>
 #include <random>
-#include <stdexcept>
 #include <string>
 #include <tuple>
-#include <utility>
 #include <vector>
 
 #include "nikitin_a_fox_algorithm/common/include/common.hpp"
 #include "nikitin_a_fox_algorithm/mpi/include/ops_mpi.hpp"
 #include "nikitin_a_fox_algorithm/seq/include/ops_seq.hpp"
 #include "util/include/func_test_util.hpp"
-#include "util/include/util.hpp"
 
 namespace nikitin_a_fox_algorithm {
 
@@ -226,7 +221,7 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
     matrix_a_ = std::vector<std::vector<double>>(n, std::vector<double>(n));
     matrix_b_ = std::vector<std::vector<double>>(n, std::vector<double>(n));
 
-    std::mt19937 gen(n * 123);
+    std::mt19937 gen(static_cast<unsigned int>(n * 123));
     std::uniform_real_distribution<double> dist(-10.0, 10.0);
 
     for (int i = 0; i < n; ++i) {
@@ -241,7 +236,7 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
 
   // Вычисление ожидаемого результата умножения матриц
   void ComputeExpectedResult() {
-    int n = matrix_a_.size();
+    auto n = static_cast<int>(matrix_a_.size());
     expected_output_ = std::vector<std::vector<double>>(n, std::vector<double>(n, 0.0));
 
     for (int i = 0; i < n; ++i) {
@@ -281,7 +276,7 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
     matrix_b_ = std::vector<std::vector<double>>(n, std::vector<double>(n));
     expected_output_ = std::vector<std::vector<double>>(n, std::vector<double>(n, 0.0));
 
-    std::mt19937 gen(n * 456);
+    std::mt19937 gen(static_cast<unsigned int>(n * 456));
     std::uniform_real_distribution<double> dist(-100.0, 100.0);
 
     for (int i = 0; i < n; ++i) {
@@ -296,7 +291,7 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
     matrix_a_ = std::vector<std::vector<double>>(n, std::vector<double>(n, 0.0));
     matrix_b_ = std::vector<std::vector<double>>(n, std::vector<double>(n, 0.0));
 
-    std::mt19937 gen(n * 789);
+    std::mt19937 gen(static_cast<unsigned int>(n * 789));
     std::uniform_real_distribution<double> dist(1.0, 10.0);
 
     for (int i = 0; i < n; ++i) {
@@ -312,7 +307,7 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
     matrix_a_ = std::vector<std::vector<double>>(n, std::vector<double>(n, 0.0));
     matrix_b_ = std::vector<std::vector<double>>(n, std::vector<double>(n, 0.0));
 
-    std::mt19937 gen(n * 1011);
+    std::mt19937 gen(static_cast<unsigned int>(n * 1011));
     std::uniform_real_distribution<double> dist(1.0, 5.0);
 
     for (int i = 0; i < n; ++i) {
@@ -330,7 +325,7 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
     matrix_a_ = std::vector<std::vector<double>>(n, std::vector<double>(n, 0.0));
     matrix_b_ = std::vector<std::vector<double>>(n, std::vector<double>(n, 0.0));
 
-    std::mt19937 gen(n * 1213);
+    std::mt19937 gen(static_cast<unsigned int>(n * 1213));
     std::uniform_real_distribution<double> dist(1.0, 5.0);
 
     for (int i = 0; i < n; ++i) {
@@ -348,7 +343,7 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
     matrix_a_ = std::vector<std::vector<double>>(n, std::vector<double>(n, 0.0));
     matrix_b_ = std::vector<std::vector<double>>(n, std::vector<double>(n, 0.0));
 
-    std::mt19937 gen(n * 1415);
+    std::mt19937 gen(static_cast<unsigned int>(n * 1415));
     std::uniform_real_distribution<double> dist(-5.0, 5.0);
 
     for (int i = 0; i < n; ++i) {
@@ -371,7 +366,7 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
     matrix_a_ = std::vector<std::vector<double>>(n, std::vector<double>(n));
     matrix_b_ = std::vector<std::vector<double>>(n, std::vector<double>(n));
 
-    std::mt19937 gen(n * 1617);
+    std::mt19937 gen(static_cast<unsigned int>(n * 1617));
     std::uniform_real_distribution<double> dist(1e-15, 1e-10);
 
     for (int i = 0; i < n; ++i) {
@@ -389,7 +384,7 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
     matrix_a_ = std::vector<std::vector<double>>(n, std::vector<double>(n));
     matrix_b_ = std::vector<std::vector<double>>(n, std::vector<double>(n));
 
-    std::mt19937 gen(n * 1819);
+    std::mt19937 gen(static_cast<unsigned int>(n * 1819));
     std::uniform_real_distribution<double> dist(1e10, 1e15);
 
     for (int i = 0; i < n; ++i) {
@@ -407,7 +402,7 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
     matrix_a_ = std::vector<std::vector<double>>(n, std::vector<double>(n));
     matrix_b_ = std::vector<std::vector<double>>(n, std::vector<double>(n));
 
-    std::mt19937 gen(n * 2021);
+    std::mt19937 gen(static_cast<unsigned int>(n * 2021));
     std::uniform_real_distribution<double> dist(-1000.0, 1000.0);
 
     for (int i = 0; i < n; ++i) {
@@ -443,7 +438,7 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
     matrix_a_ = std::vector<std::vector<double>>(n, std::vector<double>(n));
     matrix_b_ = std::vector<std::vector<double>>(n, std::vector<double>(n));
 
-    std::mt19937 gen(n * 2223);
+    std::mt19937 gen(static_cast<unsigned int>(n * 2223));
     std::uniform_real_distribution<double> dist(-5.0, 5.0);
 
     for (int i = 0; i < n; ++i) {
@@ -477,7 +472,7 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
     matrix_a_ = std::vector<std::vector<double>>(n, std::vector<double>(n));
     matrix_b_ = std::vector<std::vector<double>>(n, std::vector<double>(n));
 
-    std::mt19937 gen(seed);
+    std::mt19937 gen(static_cast<unsigned int>(seed));
     std::uniform_real_distribution<double> dist(-100.0, 100.0);
 
     for (int i = 0; i < n; ++i) {

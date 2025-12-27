@@ -2,11 +2,9 @@
 
 #include <algorithm>
 #include <cmath>
-#include <stdexcept>
 #include <vector>
 
 #include "nikitin_a_fox_algorithm/common/include/common.hpp"
-#include "util/include/util.hpp"
 
 namespace nikitin_a_fox_algorithm {
 
@@ -23,7 +21,7 @@ bool NikitinAFoxAlgorithmSEQ::ValidationImpl() {
     return false;
   }
 
-  int n = matrix_a.size();
+  auto n = static_cast<int>(matrix_a.size());
   for (int i = 0; i < n; ++i) {
     if (matrix_a[i].size() != static_cast<size_t>(n)) {
       return false;
@@ -50,16 +48,14 @@ bool NikitinAFoxAlgorithmSEQ::PreProcessingImpl() {
 bool NikitinAFoxAlgorithmSEQ::RunImpl() {
   const auto &[matrix_a, matrix_b] = GetInput();
 
-  int n = matrix_a.size();
+  auto n = static_cast<int>(matrix_a.size());
 
   // Инициализируем выходную матрицу нулями
   std::vector<std::vector<double>> matrix_c(n, std::vector<double>(n, 0.0));
 
   // Определяем размер блока - выбираем оптимальный для кэша
   int block_size = 64;
-  if (n < block_size) {
-    block_size = n;
-  }
+  block_size = std::min(n, block_size);
 
   // Вычисляем количество блоков
   int grid_size = (n + block_size - 1) / block_size;
