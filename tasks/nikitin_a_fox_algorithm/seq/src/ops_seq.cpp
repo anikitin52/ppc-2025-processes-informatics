@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstddef>
 #include <vector>
 
 #include "nikitin_a_fox_algorithm/common/include/common.hpp"
@@ -21,19 +22,19 @@ bool NikitinAFoxAlgorithmSEQ::ValidationImpl() {
     return false;
   }
 
-  auto n = static_cast<int>(matrix_a.size());
+  const auto n = static_cast<int>(matrix_a.size());
   for (int i = 0; i < n; ++i) {
-    if (matrix_a[i].size() != static_cast<size_t>(n)) {
+    if (matrix_a[i].size() != static_cast<std::size_t>(n)) {
       return false;
     }
   }
 
-  if (matrix_b.size() != static_cast<size_t>(n)) {
+  if (matrix_b.size() != static_cast<std::size_t>(n)) {
     return false;
   }
 
   for (int i = 0; i < n; ++i) {
-    if (matrix_b[i].size() != static_cast<size_t>(n)) {
+    if (matrix_b[i].size() != static_cast<std::size_t>(n)) {
       return false;
     }
   }
@@ -48,7 +49,7 @@ bool NikitinAFoxAlgorithmSEQ::PreProcessingImpl() {
 bool NikitinAFoxAlgorithmSEQ::RunImpl() {
   const auto &[matrix_a, matrix_b] = GetInput();
 
-  auto n = static_cast<int>(matrix_a.size());
+  const auto n = static_cast<int>(matrix_a.size());
 
   // Инициализируем выходную матрицу нулями
   std::vector<std::vector<double>> matrix_c(n, std::vector<double>(n, 0.0));
@@ -58,29 +59,29 @@ bool NikitinAFoxAlgorithmSEQ::RunImpl() {
   block_size = std::min(n, block_size);
 
   // Вычисляем количество блоков
-  int grid_size = (n + block_size - 1) / block_size;
+  const int grid_size = (n + block_size - 1) / block_size;
 
   // Алгоритм Фокса (последовательная версия)
   for (int iter = 0; iter < grid_size; ++iter) {
     for (int block_i = 0; block_i < grid_size; ++block_i) {
       for (int block_j = 0; block_j < grid_size; ++block_j) {
         // Вычисляем, какой блок матрицы A "активен" на этой итерации
-        int a_block_k = (block_i + iter) % grid_size;
+        const int a_block_k = (block_i + iter) % grid_size;
 
         // Границы блоков для A
-        int a_row_start = block_i * block_size;
-        int a_row_end = std::min(a_row_start + block_size, n);
-        int a_col_start = a_block_k * block_size;
-        int a_col_end = std::min(a_col_start + block_size, n);
+        const int a_row_start = block_i * block_size;
+        const int a_row_end = std::min(a_row_start + block_size, n);
+        const int a_col_start = a_block_k * block_size;
+        const int a_col_end = std::min(a_col_start + block_size, n);
 
         // Границы блоков для B и C
-        int b_col_start = block_j * block_size;
-        int b_col_end = std::min(b_col_start + block_size, n);
+        const int b_col_start = block_j * block_size;
+        const int b_col_end = std::min(b_col_start + block_size, n);
 
         // Умножаем блоки матриц
         for (int i = a_row_start; i < a_row_end; ++i) {
           for (int k = a_col_start; k < a_col_end; ++k) {
-            double a_ik = matrix_a[i][k];
+            const double a_ik = matrix_a[i][k];
             for (int j = b_col_start; j < b_col_end; ++j) {
               matrix_c[i][j] += a_ik * matrix_b[k][j];
             }

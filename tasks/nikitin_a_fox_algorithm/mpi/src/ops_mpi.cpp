@@ -3,6 +3,7 @@
 #include <mpi.h>
 
 #include <cmath>
+#include <cstddef>
 #include <vector>
 
 #include "nikitin_a_fox_algorithm/common/include/common.hpp"
@@ -26,19 +27,19 @@ bool NikitinAFoxAlgorithmMPI::ValidationImpl() {
       return false;
     }
 
-    auto n = static_cast<int>(matrix_a.size());
+    const auto n = static_cast<int>(matrix_a.size());
     for (int i = 0; i < n; ++i) {
-      if (matrix_a[i].size() != static_cast<size_t>(n)) {
+      if (matrix_a[i].size() != static_cast<std::size_t>(n)) {
         return false;
       }
     }
 
-    if (matrix_b.size() != static_cast<size_t>(n)) {
+    if (matrix_b.size() != static_cast<std::size_t>(n)) {
       return false;
     }
 
     for (int i = 0; i < n; ++i) {
-      if (matrix_b[i].size() != static_cast<size_t>(n)) {
+      if (matrix_b[i].size() != static_cast<std::size_t>(n)) {
         return false;
       }
     }
@@ -69,15 +70,15 @@ bool NikitinAFoxAlgorithmMPI::RunImpl() {
   }
 
   // Вычисляем распределение строк
-  int rows_per_proc = n / size;
-  int remainder = n % size;
+  const int rows_per_proc = n / size;
+  const int remainder = n % size;
 
   // Количество строк для текущего процесса
-  int local_rows = (rank < remainder) ? (rows_per_proc + 1) : rows_per_proc;
-  auto local_elements = static_cast<size_t>(local_rows) * static_cast<size_t>(n);
+  const int local_rows = (rank < remainder) ? (rows_per_proc + 1) : rows_per_proc;
+  const auto local_elements = static_cast<std::size_t>(local_rows) * static_cast<std::size_t>(n);
 
   // Создаем массив для матрицы B (будет одинаковый на всех процессах)
-  auto total_elements = static_cast<size_t>(n) * static_cast<size_t>(n);
+  const auto total_elements = static_cast<std::size_t>(n) * static_cast<std::size_t>(n);
   std::vector<double> local_b(total_elements);
 
   // 1. Распределяем матрицу B всем процессам
@@ -85,8 +86,9 @@ bool NikitinAFoxAlgorithmMPI::RunImpl() {
     const auto &matrix_b = GetInput().second;
     // Заполняем локальный буфер матрицей B
     for (int i = 0; i < n; ++i) {
+      const auto i_offset = static_cast<std::size_t>(i) * static_cast<std::size_t>(n);
       for (int j = 0; j < n; ++j) {
-        local_b[static_cast<size_t>(i) * static_cast<size_t>(n) + static_cast<size_t>(j)] = matrix_b[i][j];
+        local_b[i_offset + static_cast<std::size_t>(j)] = matrix_b[i][j];
       }
     }
   }
@@ -103,22 +105,23 @@ bool NikitinAFoxAlgorithmMPI::RunImpl() {
     // Сначала копируем строки для процесса 0
     int current_row = 0;
     for (int i = 0; i < local_rows; ++i) {
+      const auto i_offset = static_cast<std::size_t>(i) * static_cast<std::size_t>(n);
       for (int j = 0; j < n; ++j) {
-        local_a[static_cast<size_t>(i) * static_cast<size_t>(n) + static_cast<size_t>(j)] = matrix_a[current_row][j];
+        local_a[i_offset + static_cast<std::size_t>(j)] = matrix_a[current_row][j];
       }
       current_row++;
     }
 
     // Отправляем строки остальным процессам
     for (int dest = 1; dest < size; ++dest) {
-      int dest_rows = (dest < remainder) ? (rows_per_proc + 1) : rows_per_proc;
-      auto dest_elements = static_cast<size_t>(dest_rows) * static_cast<size_t>(n);
+      const int dest_rows = (dest < remainder) ? (rows_per_proc + 1) : rows_per_proc;
+      const auto dest_elements = static_cast<std::size_t>(dest_rows) * static_cast<std::size_t>(n);
       std::vector<double> send_buffer(dest_elements);
 
       for (int i = 0; i < dest_rows; ++i) {
+        const auto i_offset = static_cast<std::size_t>(i) * static_cast<std::size_t>(n);
         for (int j = 0; j < n; ++j) {
-          send_buffer[static_cast<size_t>(i) * static_cast<size_t>(n) + static_cast<size_t>(j)] =
-              matrix_a[current_row][j];
+          send_buffer[i_offset + static_cast<std::size_t>(j)] = matrix_a[current_row][j];
         }
         current_row++;
       }
@@ -134,14 +137,14 @@ bool NikitinAFoxAlgorithmMPI::RunImpl() {
   std::vector<double> local_c(local_elements, 0.0);
 
   for (int i = 0; i < local_rows; ++i) {
-    auto i_idx = static_cast<size_t>(i) * static_cast<size_t>(n);
+    const auto i_idx = static_cast<std::size_t>(i) * static_cast<std::size_t>(n);
     for (int j = 0; j < n; ++j) {
       double sum = 0.0;
       for (int k = 0; k < n; ++k) {
-        auto k_idx = static_cast<size_t>(k) * static_cast<size_t>(n);
-        sum += local_a[i_idx + static_cast<size_t>(k)] * local_b[k_idx + static_cast<size_t>(j)];
+        const auto k_idx = static_cast<std::size_t>(k) * static_cast<std::size_t>(n);
+        sum += local_a[i_idx + static_cast<std::size_t>(k)] * local_b[k_idx + static_cast<std::size_t>(j)];
       }
-      local_c[i_idx + static_cast<size_t>(j)] = sum;
+      local_c[i_idx + static_cast<std::size_t>(j)] = sum;
     }
   }
 
@@ -153,26 +156,26 @@ bool NikitinAFoxAlgorithmMPI::RunImpl() {
     // Копируем свои результаты
     int current_row = 0;
     for (int i = 0; i < local_rows; ++i) {
-      auto i_idx = static_cast<size_t>(i) * static_cast<size_t>(n);
+      const auto i_idx = static_cast<std::size_t>(i) * static_cast<std::size_t>(n);
       for (int j = 0; j < n; ++j) {
-        GetOutput()[current_row][j] = local_c[i_idx + static_cast<size_t>(j)];
+        GetOutput()[current_row][j] = local_c[i_idx + static_cast<std::size_t>(j)];
       }
       current_row++;
     }
 
     // Получаем результаты от других процессов
     for (int src = 1; src < size; ++src) {
-      int src_rows = (src < remainder) ? (rows_per_proc + 1) : rows_per_proc;
-      auto src_elements = static_cast<size_t>(src_rows) * static_cast<size_t>(n);
+      const int src_rows = (src < remainder) ? (rows_per_proc + 1) : rows_per_proc;
+      const auto src_elements = static_cast<std::size_t>(src_rows) * static_cast<std::size_t>(n);
       std::vector<double> recv_buffer(src_elements);
 
       MPI_Recv(recv_buffer.data(), static_cast<int>(src_elements), MPI_DOUBLE, src, 1, MPI_COMM_WORLD,
                MPI_STATUS_IGNORE);
 
       for (int i = 0; i < src_rows; ++i) {
-        auto i_idx = static_cast<size_t>(i) * static_cast<size_t>(n);
+        const auto i_idx = static_cast<std::size_t>(i) * static_cast<std::size_t>(n);
         for (int j = 0; j < n; ++j) {
-          GetOutput()[current_row][j] = recv_buffer[i_idx + static_cast<size_t>(j)];
+          GetOutput()[current_row][j] = recv_buffer[i_idx + static_cast<std::size_t>(j)];
         }
         current_row++;
       }
@@ -187,9 +190,9 @@ bool NikitinAFoxAlgorithmMPI::RunImpl() {
     // Преобразуем результат в плоский массив для рассылки
     std::vector<double> flat_result(total_elements);
     for (int i = 0; i < n; ++i) {
-      auto i_idx = static_cast<size_t>(i) * static_cast<size_t>(n);
+      const auto i_offset = static_cast<std::size_t>(i) * static_cast<std::size_t>(n);
       for (int j = 0; j < n; ++j) {
-        flat_result[i_idx + static_cast<size_t>(j)] = GetOutput()[i][j];
+        flat_result[i_offset + static_cast<std::size_t>(j)] = GetOutput()[i][j];
       }
     }
 
@@ -198,9 +201,9 @@ bool NikitinAFoxAlgorithmMPI::RunImpl() {
 
     // На других процессах преобразуем обратно в матрицу
     for (int i = 0; i < n; ++i) {
-      auto i_idx = static_cast<size_t>(i) * static_cast<size_t>(n);
+      const auto i_offset = static_cast<std::size_t>(i) * static_cast<std::size_t>(n);
       for (int j = 0; j < n; ++j) {
-        GetOutput()[i][j] = flat_result[i_idx + static_cast<size_t>(j)];
+        GetOutput()[i][j] = flat_result[i_offset + static_cast<std::size_t>(j)];
       }
     }
   } else {
@@ -211,9 +214,9 @@ bool NikitinAFoxAlgorithmMPI::RunImpl() {
     MPI_Bcast(flat_result.data(), static_cast<int>(total_elements), MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
     for (int i = 0; i < n; ++i) {
-      auto i_idx = static_cast<size_t>(i) * static_cast<size_t>(n);
+      const auto i_offset = static_cast<std::size_t>(i) * static_cast<std::size_t>(n);
       for (int j = 0; j < n; ++j) {
-        GetOutput()[i][j] = flat_result[i_idx + static_cast<size_t>(j)];
+        GetOutput()[i][j] = flat_result[i_offset + static_cast<std::size_t>(j)];
       }
     }
   }

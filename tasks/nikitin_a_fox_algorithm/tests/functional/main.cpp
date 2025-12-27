@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <limits>
 #include <random>
+#include <stdexcept>
 #include <string>
 #include <tuple>
 #include <vector>
@@ -236,7 +237,7 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
 
   // Вычисление ожидаемого результата умножения матриц
   void ComputeExpectedResult() {
-    auto n = static_cast<int>(matrix_a_.size());
+    const auto n = static_cast<int>(matrix_a_.size());
     expected_output_ = std::vector<std::vector<double>>(n, std::vector<double>(n, 0.0));
 
     for (int i = 0; i < n; ++i) {
@@ -417,8 +418,8 @@ class NikitinAFoxAlgorithmFuncTests : public ppc::util::BaseRunFuncTests<InType,
 
   // Генерация матриц с постоянными элементами
   void GenerateConstantMatrices(int n) {
-    double val_a = 2.5;
-    double val_b = 3.5;
+    const double val_a = 2.5;
+    const double val_b = 3.5;
 
     matrix_a_ = std::vector<std::vector<double>>(n, std::vector<double>(n, val_a));
     matrix_b_ = std::vector<std::vector<double>>(n, std::vector<double>(n, val_b));
