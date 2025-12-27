@@ -67,23 +67,21 @@ bool NikitinAFoxAlgorithmSEQ::RunImpl() {
   // Алгоритм Фокса (последовательная версия)
   for (int iter = 0; iter < grid_size; ++iter) {
     for (int block_i = 0; block_i < grid_size; ++block_i) {
-      // Вычисляем, какой блок матрицы A "активен" на этой итерации
-      int a_block_k = (block_i + iter) % grid_size;
-      
-      // Границы блоков для A
-      int a_row_start = block_i * block_size;
-      int a_row_end = std::min(a_row_start + block_size, n);
-      int a_col_start = a_block_k * block_size;
-      int a_col_end = std::min(a_col_start + block_size, n);
-      
-      
       for (int block_j = 0; block_j < grid_size; ++block_j) {
+        // Вычисляем, какой блок матрицы A "активен" на этой итерации
+        int a_block_k = (block_i + iter) % grid_size;
+        
+        // Границы блоков для A
+        int a_row_start = block_i * block_size;
+        int a_row_end = std::min(a_row_start + block_size, n);
+        int a_col_start = a_block_k * block_size;
+        int a_col_end = std::min(a_col_start + block_size, n);
+        
         // Границы блоков для B и C
         int b_col_start = block_j * block_size;
         int b_col_end = std::min(b_col_start + block_size, n);
         
-        
-        // Умножаем блоки матриц с учетом возможных неравных размеров
+        // Умножаем блоки матриц
         for (int i = a_row_start; i < a_row_end; ++i) {
           for (int k = a_col_start; k < a_col_end; ++k) {
             double a_ik = matrix_a[i][k];

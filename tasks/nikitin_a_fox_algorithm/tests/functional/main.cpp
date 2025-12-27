@@ -498,7 +498,7 @@ TEST_P(NikitinAFoxAlgorithmFuncTests, MatrixMultiplicationTest) {
   ExecuteTest(GetParam());
 }
 
-// Определяем тестовые случаи (30 тестов вместо 40)
+// Определяем тестовые случаи 
 const std::array<TestType, 30> kTestParam = {
     std::make_tuple(1, "1x1_matrices"),
     std::make_tuple(2, "2x2_matrices"),
