@@ -4,7 +4,6 @@
 
 #include <cmath>
 #include <cstddef>
-#include <vector>
 
 #include "nikitin_a_fox_algorithm/common/include/common.hpp"
 
